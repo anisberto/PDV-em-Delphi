@@ -163,7 +163,7 @@ begin
   habilitarCampos;
   dm.tb_usuarios.Insert;
   btnSalvar.Enabled := true;
-  edtNome.Enabled := true;
+  EdtNome.Enabled := true;
 end;
 
 procedure TFrmUsuarios.btnSalvarClick(Sender: TObject);

@@ -3,7 +3,8 @@ unit Login;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.jpeg, Vcl.ExtCtrls,
   Vcl.Imaging.pngimage, Vcl.StdCtrls, Vcl.Buttons;
 
@@ -19,11 +20,10 @@ type
     procedure FormCanResize(Sender: TObject; var NewWidth, NewHeight: Integer;
       var Resize: Boolean);
     procedure btnLoginClick(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     procedure centralizarPainel;
-    procedure login;
+    procedure Login;
   public
     { Public declarations }
   end;
@@ -35,83 +35,68 @@ implementation
 
 {$R *.dfm}
 
-uses Menu, Modulo;
+uses Menu, Modulo, Usuarios, Funcionarios;
 
 procedure TFrmLogin.btnLoginClick(Sender: TObject);
 begin
-     if Trim(EdtUsuario.Text) = '' then
-     begin
-         MessageDlg('Preencha o Usuário!', mtInformation, mbOKCancel, 0);
-         EdtUsuario.SetFocus;
-         exit;
-     end;
 
-      if Trim(EdtSenha.Text) = '' then
-     begin
-         MessageDlg('Preencha a Senha!', mtInformation, mbOKCancel, 0);
-         EdtSenha.SetFocus;
-         FrmMenu.ShowModal;
-         exit;
-     end;
+  if Trim(EdtUsuario.Text) = '' then
+  begin
+    MessageDlg('Preencha o Usuário!', mtInformation, mbOKCancel, 0);
+    EdtUsuario.SetFocus;
+    exit;
+  end;
 
-
-     FrmMenu := TFrmMenu.Create(FrmLogin);
-     FrmMenu.ShowModal;
-
+  if Trim(EdtSenha.Text) = '' then
+  begin
+    MessageDlg('Preencha a Senha!', mtInformation, mbOKCancel, 0);
+    EdtSenha.SetFocus;
+    FrmMenu.ShowModal;
+    exit;
+  end;
+  FrmMenu := TFrmMenu.Create(FrmMenu);
+  FrmMenu.ShowModal;
 
 end;
 
 procedure TFrmLogin.centralizarPainel;
 begin
-    pnlLogin.Top := (self.Height div 2) - (pnlLogin.Height div 2);
-    pnlLogin.Left := (self.Width div 2) - (pnlLogin.Width div 2);
+  pnlLogin.Top := (self.Height div 2) - (pnlLogin.Height div 2);
+  pnlLogin.Left := (self.Width div 2) - (pnlLogin.Width div 2);
 end;
 
-procedure TFrmLogin.FormCanResize(Sender: TObject; var NewWidth,
-  NewHeight: Integer; var Resize: Boolean);
+procedure TFrmLogin.FormCanResize(Sender: TObject;
+  var NewWidth, NewHeight: Integer; var Resize: Boolean);
 begin
-     centralizarPainel;
+  centralizarPainel;
 end;
 
-procedure TFrmLogin.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TFrmLogin.Login;
 begin
- if key = 13 then
- login;
+  dm.query_usuarios.Close;
+  dm.query_usuarios.SQL.Clear;
+  dm.query_usuarios.SQL.Add
+    ('SELECT * from usuarios where usuario = :usuario and senha = :senha');
+  dm.query_usuarios.ParamByName('usuario').Value := EdtUsuario.Text;
+  dm.query_usuarios.ParamByName('senha').Value := EdtSenha.Text;
+  dm.query_usuarios.Open;
 
-end;
+  if not dm.query_usuarios.isEmpty then
+  begin
+    nomeUsuario := dm.query_usuarios['usuario'];
+    cargoUsuario := dm.query_usuarios['cargo'];
+    FrmMenu := TFrmMenu.Create(FrmLogin);
+    EdtSenha.Text := '';
+    FrmMenu.ShowModal;
 
-procedure TFrmLogin.login;
-begin
-//AQUI VIRA O CÓDIGO DE LOGIN
-
-       dm.query_usuarios.Close;
-       dm.query_usuarios.SQL.Clear;
-       dm.query_usuarios.SQL.Add('SELECT * from usuarios where usuario = :usuario and senha = :senha');
-        dm.query_usuarios.ParamByName('usuario').Value := edtUsuario.Text;
-         dm.query_usuarios.ParamByName('senha').Value := edtSenha.Text;
-       dm.query_usuarios.Open;
-
-       if not dm.query_usuarios.isEmpty then
-       begin
-         nomeUsuario :=  dm.query_usuarios['usuario'];
-         cargoUsuario :=  dm.query_usuarios['cargo'];
-         FrmMenu := TFrmMenu.Create(FrmLogin);
-         EdtSenha.Text := '';
-         FrmMenu.ShowModal;
-
-          end
-          else
-          begin
-           MessageDlg('Os dados estão incorretos!!', mtInformation, mbOKCancel, 0);
-           edtusuario.Text := '';
-           EdtSenha.Text := '';
-           edtUsuario.SetFocus;
-       end;
-
-
-
-
+  end
+  else
+  begin
+    MessageDlg('Os dados estão incorretos!!', mtInformation, mbOKCancel, 0);
+    EdtUsuario.Text := '';
+    EdtSenha.Text := '';
+    EdtUsuario.SetFocus;
+  end;
 end;
 
 end.

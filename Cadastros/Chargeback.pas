@@ -23,7 +23,6 @@ type
     btnEditar: TSpeedButton;
     btnExcluir: TSpeedButton;
     btnSalvar: TSpeedButton;
-    Image1: TImage;
     procedure btnNovoClick(Sender: TObject);
     procedure btnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -152,7 +151,8 @@ begin
   associarCampos;
   dm.query_chargeback.Close;
   dm.query_chargeback.SQL.Clear;
-  dm.query_chargeback.SQL.Add ('UPDATE funcionarios set nome = :nome, pedido = :pedido, email = :email where id = :id');
+  dm.query_chargeback.SQL.Add
+    ('UPDATE funcionarios set nome = :nome, pedido = :pedido, email = :email where id = :id');
   dm.query_chargeback.ParamByName('nome').Value := edtNome.Text;
   dm.query_chargeback.ParamByName('pedido').Value := edtPedido.Text;
   dm.query_chargeback.ParamByName('endereco').Value := edtEmail.Text;
@@ -160,7 +160,6 @@ begin
   dm.query_chargeback.ParamByName('id').Value := id;
   dm.query_chargeback.ExecSQL;
 
-  // EDITAR O CARGO DO USUÁRIO
   dm.query_chargeback.Close;
   dm.query_chargeback.SQL.Clear;
   dm.query_chargeback.ExecSQL;

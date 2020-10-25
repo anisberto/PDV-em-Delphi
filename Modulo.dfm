@@ -14,7 +14,7 @@ object dm: Tdm
     Top = 8
   end
   object FDPhysMySQLDriverLink1: TFDPhysMySQLDriverLink
-    VendorLib = 'C:\Users\supor\Documents\Delphi\Arquivos\libmySQL.dll'
+    VendorLib = 'D:\Cursos\PDV-em-Delphi\libs\libmySQL.dll'
     Left = 712
   end
   object tb_Cargos: TFDTable
@@ -290,6 +290,7 @@ object dm: Tdm
       FieldName = 'id'
       Origin = 'id'
       ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
     end
   end
   object DSchargeback: TDataSource

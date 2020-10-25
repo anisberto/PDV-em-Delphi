@@ -3,7 +3,8 @@ unit Fornecedores;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Buttons, Vcl.Grids,
   Vcl.DBGrids, Vcl.Mask, Vcl.StdCtrls;
 
@@ -33,22 +34,22 @@ type
     procedure EdtBuscarNomeChange(Sender: TObject);
   private
     { Private declarations }
-      procedure limpar;
-      procedure habilitarCampos;
-      procedure desabilitarCampos;
+    procedure limpar;
+    procedure habilitarCampos;
+    procedure desabilitarCampos;
 
-      procedure associarCampos;
-      procedure listar;
+    procedure associarCampos;
+    procedure listar;
 
-
-      procedure buscarNome;
+    procedure buscarNome;
   public
     { Public declarations }
   end;
 
 var
   FrmFornecedores: TFrmFornecedores;
-   id : string;
+  id: string;
+
 implementation
 
 {$R *.dfm}
@@ -59,58 +60,57 @@ uses Modulo;
 
 procedure TFrmFornecedores.associarCampos;
 begin
-   dm.tb_forn.FieldByName('nome').Value := edtNome.Text;
-   dm.tb_forn.FieldByName('produto').Value := edtProduto.Text;
-   dm.tb_forn.FieldByName('telefone').Value := edtTel.Text;
-   dm.tb_forn.FieldByName('endereco').Value := EdtEndereco.Text;
+  dm.tb_forn.FieldByName('nome').Value := EdtNome.Text;
+  dm.tb_forn.FieldByName('produto').Value := edtProduto.Text;
+  dm.tb_forn.FieldByName('telefone').Value := EdtTel.Text;
+  dm.tb_forn.FieldByName('endereco').Value := EdtEndereco.Text;
 
-   dm.tb_forn.FieldByName('data').Value := DateToStr(Date);
+  dm.tb_forn.FieldByName('data').Value := DateToStr(Date);
 end;
 
 procedure TFrmFornecedores.BtnEditarClick(Sender: TObject);
 begin
   if Trim(EdtNome.Text) = '' then
-       begin
-           MessageDlg('Preencha o Nome!', mtInformation, mbOKCancel, 0);
-           EdtNome.SetFocus;
-           exit;
-       end;
+  begin
+    MessageDlg('Preencha o Nome!', mtInformation, mbOKCancel, 0);
+    EdtNome.SetFocus;
+    exit;
+  end;
 
+  associarCampos;
+  dm.query_forn.Close;
+  dm.query_forn.SQL.Clear;
+  dm.query_forn.SQL.Add
+    ('UPDATE fornecedores set nome = :nome, produto = :produto, endereco = :endereco, telefone = :telefone where id = :id');
+  dm.query_forn.ParamByName('nome').Value := EdtNome.Text;
+  dm.query_forn.ParamByName('produto').Value := edtProduto.Text;
+  dm.query_forn.ParamByName('endereco').Value := EdtEndereco.Text;
+  dm.query_forn.ParamByName('telefone').Value := EdtTel.Text;
 
-       associarCampos;
-       dm.query_forn.Close;
-       dm.query_forn.SQL.Clear;
-       dm.query_forn.SQL.Add('UPDATE fornecedores set nome = :nome, produto = :produto, endereco = :endereco, telefone = :telefone where id = :id');
-       dm.query_forn.ParamByName('nome').Value := edtNome.Text;
-        dm.query_forn.ParamByName('produto').Value := edtProduto.Text;
-         dm.query_forn.ParamByName('endereco').Value := EdtEndereco.Text;
-          dm.query_forn.ParamByName('telefone').Value := edtTel.Text;
+  dm.query_forn.ParamByName('id').Value := id;
+  dm.query_forn.ExecSQL;
 
-       dm.query_forn.ParamByName('id').Value := id;
-       dm.query_forn.ExecSQL;
-
-
-       listar;
-       MessageDlg('Editado com Sucesso!!', mtInformation, mbOKCancel, 0);
-       btnEditar.Enabled := false;
-       BtnExcluir.Enabled := false;
-       limpar;
-       desabilitarCampos;
+  listar;
+  MessageDlg('Editado com Sucesso!!', mtInformation, mbOKCancel, 0);
+  BtnEditar.Enabled := false;
+  BtnExcluir.Enabled := false;
+  limpar;
+  desabilitarCampos;
 end;
 
 procedure TFrmFornecedores.BtnExcluirClick(Sender: TObject);
 begin
-if MessageDlg('Deseja Excluir o registro?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-begin
-  dm.tb_forn.Delete;
+  if MessageDlg('Deseja Excluir o registro?', mtConfirmation, [mbYes, mbNo], 0)
+    = mrYes then
+  begin
+    dm.tb_forn.Delete;
     MessageDlg('Deletado com Sucesso!!', mtInformation, mbOKCancel, 0);
 
-
-     btnEditar.Enabled := false;
-     BtnExcluir.Enabled := false;
-     edtNome.Text := '';
-     listar;
-end;
+    BtnEditar.Enabled := false;
+    BtnExcluir.Enabled := false;
+    EdtNome.Text := '';
+    listar;
+  end;
 end;
 
 procedure TFrmFornecedores.btnNovoClick(Sender: TObject);
@@ -122,54 +122,50 @@ end;
 
 procedure TFrmFornecedores.btnSalvarClick(Sender: TObject);
 begin
-       if Trim(EdtNome.Text) = '' then
-       begin
-           MessageDlg('Preencha o Nome!', mtInformation, mbOKCancel, 0);
-           EdtNome.SetFocus;
-           exit;
-       end;
+  if Trim(EdtNome.Text) = '' then
+  begin
+    MessageDlg('Preencha o Nome!', mtInformation, mbOKCancel, 0);
+    EdtNome.SetFocus;
+    exit;
+  end;
 
-
-
-        associarCampos;
-        dm.tb_forn.Post;
-        MessageDlg('Salvo com Sucesso', mtInformation, mbOKCancel, 0);
-        limpar;
-        desabilitarCampos;
-        btnSalvar.Enabled := false;
-        listar;
+  associarCampos;
+  dm.tb_forn.Post;
+  MessageDlg('Salvo com Sucesso', mtInformation, mbOKCancel, 0);
+  limpar;
+  desabilitarCampos;
+  btnSalvar.Enabled := false;
+  listar;
 
 end;
 
 procedure TFrmFornecedores.buscarNome;
 begin
-       dm.query_forn.Close;
-       dm.query_forn.SQL.Clear;
-       dm.query_forn.SQL.Add('SELECT * from fornecedores where nome LIKE :nome order by nome asc');
-       dm.query_forn.ParamByName('nome').Value := EdtBuscarNome.Text + '%';
-       dm.query_forn.Open;
+  dm.query_forn.Close;
+  dm.query_forn.SQL.Clear;
+  dm.query_forn.SQL.Add
+    ('SELECT * from fornecedores where nome LIKE :nome order by nome asc');
+  dm.query_forn.ParamByName('nome').Value := EdtBuscarNome.Text + '%';
+  dm.query_forn.Open;
 end;
 
 procedure TFrmFornecedores.DBGrid1CellClick(Column: TColumn);
 begin
-habilitarCampos;
-  btnEditar.Enabled := true;
-  btnExcluir.Enabled := true;
+  habilitarCampos;
+  BtnEditar.Enabled := true;
+  BtnExcluir.Enabled := true;
 
   dm.tb_forn.Edit;
 
-
-  edtNome.Text := dm.query_forn.FieldByName('nome').Value;
+  EdtNome.Text := dm.query_forn.FieldByName('nome').Value;
 
   edtProduto.Text := dm.query_forn.FieldByName('produto').Value;
 
-
-
   if dm.query_forn.FieldByName('telefone').Value <> null then
-  edtTel.Text := dm.query_forn.FieldByName('telefone').Value;
+    EdtTel.Text := dm.query_forn.FieldByName('telefone').Value;
 
   if dm.query_forn.FieldByName('endereco').Value <> null then
-  EdtEndereco.Text := dm.query_forn.FieldByName('endereco').Value;
+    EdtEndereco.Text := dm.query_forn.FieldByName('endereco').Value;
 
   id := dm.query_forn.FieldByName('id').Value;
 
@@ -177,7 +173,7 @@ end;
 
 procedure TFrmFornecedores.desabilitarCampos;
 begin
-  edtNome.Enabled := false;
+  EdtNome.Enabled := false;
   edtProduto.Enabled := false;
   EdtEndereco.Enabled := false;
   EdtTel.Enabled := false;
@@ -186,19 +182,19 @@ end;
 
 procedure TFrmFornecedores.EdtBuscarNomeChange(Sender: TObject);
 begin
-buscarNome;
+  buscarNome;
 end;
 
 procedure TFrmFornecedores.FormShow(Sender: TObject);
 begin
-desabilitarCampos;
+  desabilitarCampos;
   dm.tb_forn.Active := true;
   listar;
 end;
 
 procedure TFrmFornecedores.habilitarCampos;
 begin
- edtNome.Enabled := true;
+  EdtNome.Enabled := true;
   edtProduto.Enabled := true;
   EdtEndereco.Enabled := true;
   EdtTel.Enabled := true;
@@ -206,7 +202,7 @@ end;
 
 procedure TFrmFornecedores.limpar;
 begin
- edtNome.Text := '';
+  EdtNome.Text := '';
   edtProduto.Text := '';
   EdtEndereco.Text := '';
   EdtTel.Text := '';
@@ -214,10 +210,10 @@ end;
 
 procedure TFrmFornecedores.listar;
 begin
-       dm.query_forn.Close;
-       dm.query_forn.SQL.Clear;
-       dm.query_forn.SQL.Add('SELECT * from fornecedores order by nome asc');
-       dm.query_forn.Open;
+  dm.query_forn.Close;
+  dm.query_forn.SQL.Clear;
+  dm.query_forn.SQL.Add('SELECT * from fornecedores order by nome asc');
+  dm.query_forn.Open;
 end;
 
 end.

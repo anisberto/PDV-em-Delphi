@@ -14,7 +14,6 @@ object FrmLogin: TFrmLogin
   OldCreateOrder = False
   WindowState = wsMaximized
   OnCanResize = FormCanResize
-  OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
@@ -6576,6 +6575,7 @@ object FrmLogin: TFrmLogin
         Top = 113
         Width = 233
         Height = 20
+        TabStop = False
         BiDiMode = bdLeftToRight
         BorderStyle = bsNone
         Font.Charset = DEFAULT_CHARSET
@@ -6592,6 +6592,7 @@ object FrmLogin: TFrmLogin
         Top = 168
         Width = 233
         Height = 20
+        TabStop = False
         BiDiMode = bdLeftToRight
         BorderStyle = bsNone
         Font.Charset = DEFAULT_CHARSET
